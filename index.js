@@ -46,7 +46,7 @@ var getExpressApp = function(){
 	return app;
 };
 
-var ensureAuthenticated = function(req, res, next) {
+function ensureAuthenticated(req, res, next) {
 	if (req.isAuthenticated()) {
 		return next();
 	}
@@ -56,13 +56,9 @@ var ensureAuthenticated = function(req, res, next) {
 	}
 }
 
-var requiresAuthentication = function(){
-	return ensureAuthenticated;
-};
 
 module.exports = {
 	createApiServer : createApiServer,
 	getExpressApp : getExpressApp,
-	ensureAuthenticated: ensureAuthenticated,
-	requiresAuthentication: requiresAuthentication
+	ensureAuthenticated: ensureAuthenticated
 }
