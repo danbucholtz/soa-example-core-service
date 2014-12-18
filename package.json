@@ -12,7 +12,7 @@
   	"connect-redis" : "1.4.x",
   	"express": "3.*",
     "passport": "*",
-    "passport-local": "*",
+    "passport-http-bearer": "*",
     "soa-example-user-service-api": "git://github.com/danbucholtz/soa-example-user-service-api"
   }
 }
