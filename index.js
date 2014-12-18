@@ -46,7 +46,7 @@ var getExpressApp = function(){
 	return app;
 };
 
-var ensureAuthenticated = function (req, res, next) {
+function ensureAuthenticated(req, res, next) {
 	if (req.isAuthenticated()) {
 		return next();
 	}
