@@ -29,6 +29,8 @@ var createServer = function(port){
 	  console.log('Node is starting up');
 	  console.log('Express server listening on port ' + app.get('port'));
 	});
+
+	return app;
 };
 
 var getExpressApp = function(){
