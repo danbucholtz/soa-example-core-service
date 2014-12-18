@@ -52,7 +52,7 @@ function ensureAuthenticated(req, res, next) {
 	}
 	else {
 		res.statusCode = 401;
-		res.send({success:false, errorMessage:"Invalid Access Token"});.
+		res.send({success:false, errorMessage:"Invalid Access Token"});
 	}
 }
 
