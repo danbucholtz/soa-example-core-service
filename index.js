@@ -1,21 +1,54 @@
 var express = require('express');
 var http = require('http');
 var passport = require('passport');
-var  BearerStrategy = require('passport-http-bearer').Strategy;
+var redis = require("redis");
+
+var BearerStrategy = require('passport-http-bearer').Strategy;
 
 var userServiceApi = require('soa-example-user-service-api');
 var utils = require('soa-example-core-utils');
 
 var app = express();
 
+var redisClient = redis.createClient();
+
+redisClient.on("error", function (err) {
+	console.log("Redis Error: " + err);
+});
+
 passport.use(new BearerStrategy({}, function(token, done) {
 	process.nextTick(function () {
-		userServiceApi.getUserByToken(token).then(function(user){
-			if ( !user ){
-				return done(null, false, {message: "Unknown access token: " + token});
+
+		// store the user in redis to avoid some unnecessary service calls
+		redisClient.get(token, function(err, userJson){
+			if ( userJson ){
+				var userObject = null;
+				try{
+					userObject = JSON.parse(userJson);
+
+				}
+				catch(ex){
+				}
+				if ( userObject ){
+					return done(null, userObject);
+				}
+				
+				// the user was not in redis or was invalid json or something
+				// get the user
+				userServiceApi.getUserByToken(token).then(function(user){
+					if ( !user ){
+						return done(null, false, {message: "Unknown access token: " + token});
+					}
+					// put the user in redis before returning
+					var json = JSON.stringify(user);
+
+					redisClient.set(user.accessToken, json);
+
+					return done(null, user);
+				});
 			}
-			return done(null, user);
 		});
+		
 	});
 }));
 

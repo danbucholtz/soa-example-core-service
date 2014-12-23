@@ -13,6 +13,8 @@
   	"express": "3.*",
     "passport": "*",
     "passport-http-bearer": "*",
+    "redis" : "*",
+    "hiredis" : "*",
     "soa-example-user-service-api": "git://github.com/danbucholtz/soa-example-user-service-api"
   }
 }
