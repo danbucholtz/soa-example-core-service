@@ -55,7 +55,16 @@ function ensureAuthenticated(req, res, next) {
 		res.send({success:false, errorMessage:"Invalid Access Token"});
 	}
 	*/
-	return passport.authenticate('bearer', { session: false });
+	passport.authenticate('bearer', { session: false }, function(err, user, info){
+		if ( err ){
+			return next(err);
+		}
+		if ( !user ){
+			res.statusCode = 401;
+			res.send({success:false, errorMessage:"Invalid Access Token"});
+		}
+		
+	})(req, res, next);
 }
 
 
