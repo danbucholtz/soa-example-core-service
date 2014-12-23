@@ -32,23 +32,21 @@ passport.use(new BearerStrategy({}, function(token, done) {
 				if ( userObject ){
 					return done(null, userObject);
 				}
-				
-				// the user was not in redis or was invalid json or something
-				// get the user
-				userServiceApi.getUserByToken(token).then(function(user){
-					if ( !user ){
-						return done(null, false, {message: "Unknown access token: " + token});
-					}
-					// put the user in redis before returning
-					var json = JSON.stringify(user);
-
-					redisClient.set(user.accessToken, json);
-
-					return done(null, user);
-				});
 			}
+			// the user was not in redis or was invalid json or something
+			// get the user
+			userServiceApi.getUserByToken(token).then(function(user){
+				if ( !user ){
+					return done(null, false, {message: "Unknown access token: " + token});
+				}
+				// put the user in redis before returning
+				var json = JSON.stringify(user);
+
+				redisClient.set(user.accessToken, json);
+
+				return done(null, user);
+			});
 		});
-		
 	});
 }));
 
