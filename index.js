@@ -47,13 +47,15 @@ var getExpressApp = function(){
 };
 
 function ensureAuthenticated(req, res, next) {
-	if (req.isAuthenticated()) {
+	/*if (req.isAuthenticated()) {
 		return next();
 	}
 	else {
 		res.statusCode = 401;
 		res.send({success:false, errorMessage:"Invalid Access Token"});
 	}
+	*/
+	return passport.authenticate('bearer', { session: false });
 }
 
 
