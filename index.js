@@ -47,23 +47,14 @@ var getExpressApp = function(){
 };
 
 function ensureAuthenticated(req, res, next) {
-	/*if (req.isAuthenticated()) {
+	if ( req.isAuthenticated() ){
 		return next();
 	}
-	else {
-		res.statusCode = 401;
-		res.send({success:false, errorMessage:"Invalid Access Token"});
-	}
-	*/
-	passport.authenticate('bearer', { session: false }, function(err, user, info){
-		if ( err ){
-			return next(err);
+	passport.authenticate('bearer', { session: false }, function (err, user) {
+		if (user) {
+			req.user = user;
+			return next();
 		}
-		if ( !user ){
-			res.statusCode = 401;
-			res.send({success:false, errorMessage:"Invalid Access Token"});
-		}
-		
 	})(req, res, next);
 }
 
