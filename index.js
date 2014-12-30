@@ -97,7 +97,7 @@ function ensureAuthenticated(req, res, next) {
 		return next();
 	}
 	// check for the basic auth header
-	if ( req.headers && req.headers.authorization && req.headers.authorization.indexOf("Basic ") ){
+	if ( req.headers && req.headers.authorization && req.headers.authorization.indexOf("Basic ") >= 0 ){
 		// support basic, too
 		passport.authenticate('basic', { session: false }, function(err, user){
 			if (user) {
@@ -106,13 +106,16 @@ function ensureAuthenticated(req, res, next) {
 			}
 		})(req, res, next);
 	}
-	else{
+	else if ( req.headers && req.headers.authorization && req.headers.authorization.indexOf("Bearer ") >= 0 ){
 		passport.authenticate('bearer', { session: false }, function (err, user) {
 			if (user) {
 				req.user = user;
 				return next();
 			}
 		})(req, res, next);
+	}
+	else{
+		return next(new Error(401));
 	}
 }
 
