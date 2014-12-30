@@ -17,7 +17,6 @@
     "soa-example-authentication-service-api" : "git://github.com/danbucholtz/soa-example-authentication-service-api",
     "soa-example-authorization-service-api" : "git://github.com/danbucholtz/soa-example-authorization-service-api",
     "soa-example-logging-service-api" : "git://github.com/danbucholtz/soa-example-logging-service-api",
-    "soa-example-redis-util" : "git://github.com/danbucholtz/soa-example-redis-util",
     "soa-example-user-service-api": "git://github.com/danbucholtz/soa-example-user-service-api"
   }
 }
