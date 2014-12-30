@@ -1,26 +1,21 @@
 var express = require('express');
 var http = require('http');
 var passport = require('passport');
-var redis = require("redis");
 
 var BearerStrategy = require('passport-http-bearer').Strategy;
 
 var userServiceApi = require('soa-example-user-service-api');
 var utils = require('soa-example-core-utils');
 
+var redisUtil = require('soa-example-redis-util');
+
 var app = express();
-
-var redisClient = redis.createClient();
-
-redisClient.on("error", function (err) {
-	console.log("Redis Error: " + err);
-});
 
 passport.use(new BearerStrategy({}, function(token, done) {
 	process.nextTick(function () {
 
 		// store the user in redis to avoid some unnecessary service calls
-		redisClient.get(token, function(err, userJson){
+		redisUtil.getRedisClient().get(token, function(err, userJson){
 			if ( userJson ){
 				var userObject = null;
 				try{
@@ -42,7 +37,7 @@ passport.use(new BearerStrategy({}, function(token, done) {
 				// put the user in redis before returning
 				var json = JSON.stringify(user);
 
-				redisClient.set(user.accessToken, json);
+				redisUtil.getRedisClient().set(user.accessToken, json);
 
 				return done(null, user);
 			});
