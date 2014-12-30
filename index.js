@@ -115,7 +115,9 @@ function ensureAuthenticated(req, res, next) {
 		})(req, res, next);
 	}
 	else{
-		return next(new Error(401));
+		res.statusCode = 401;
+		res.send({success: false, errorMessage:"A Bearer Token is required"});
+		next("Missing Bearer Token");
 	}
 }
 
