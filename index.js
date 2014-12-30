@@ -3,7 +3,10 @@ var http = require('http');
 var passport = require('passport');
 
 var BearerStrategy = require('passport-http-bearer').Strategy;
+var BasicStrategy = require('passport-http').BasicStrategy;
 
+var authenticationService = require("soa-example-authentication-service-api");
+var authorizationService = require("soa-example-authorization-service-api");
 var userServiceApi = require('soa-example-user-service-api');
 var utils = require('soa-example-core-utils');
 
@@ -45,6 +48,23 @@ passport.use(new BearerStrategy({}, function(token, done) {
 	});
 }));
 
+passport.use(new BasicStrategy({}, function(username, password, done) {
+	process.nextTick(function () {
+		authenticationService.authenticateUserByEmailAddressAndPassword(username, password).then(function(response){
+			if ( !response.success ){
+				return done(null, false, {message: "Unknown User: " + username} );
+      		}
+      		var user = response.user;
+      		authorizationService.getPermissions(user.accessToken).then(function(permissions){
+      			user.permissions = permissions;
+      			return done (null, user);
+      		}, function(err){
+      			return done(null, false, { message: err.toString() });
+      		});
+		});
+	});
+}));
+
 
 var createApiServer = function(port){
 	app.configure(function(){
@@ -76,14 +96,25 @@ function ensureAuthenticated(req, res, next) {
 	if ( req.isAuthenticated() ){
 		return next();
 	}
-	passport.authenticate('bearer', { session: false }, function (err, user) {
-		if (user) {
-			req.user = user;
-			return next();
-		}
-	})(req, res, next);
+	// check for the basic auth header
+	if ( req.headers && req.headers.authorization && req.headers.authorization.indexOf("Basic ") ){
+		// support basic, too
+		passport.authenticate('basic', { session: false }, function(err, user){
+			if (user) {
+				req.user = user;
+				return next();
+			}
+		})(req, res, next);
+	}
+	else{
+		passport.authenticate('bearer', { session: false }, function (err, user) {
+			if (user) {
+				req.user = user;
+				return next();
+			}
+		})(req, res, next);
+	}
 }
-
 
 module.exports = {
 	createApiServer : createApiServer,
