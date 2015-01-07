@@ -86,24 +86,30 @@ function ensureAuthenticated(req, res, next) {
 			// start checkinging headers for authentication
 			if ( req.headers && req.headers.authorization && req.headers.authorization.indexOf("Basic ") >= 0 ){
 				// support basic, too
-				passport.authenticate('basic', { session: false }, function(err, user){
+				passport.authenticate('basic', { session: false }, function(err, user, object){
 					if (user) {
 						req.user = user;
 						return next();
 					}
 					else{
-						bannedIpService.invalidBasicCredentials(ipAddress, err.username, err.password);
+						bannedIpService.invalidBasicCredentials(ipAddress, object.username, object.password);
+						res.statusCode = 401;
+                        res.send({success: false, errorMessage:"Valid User Credentials are required for Basic authentication"});
+                        next("Valid User Credentials are required");
 					}
 				})(req, res, next);
 			}
 			else if ( req.headers && req.headers.authorization && req.headers.authorization.indexOf("Bearer ") >= 0 ){
-				passport.authenticate('bearer', { session: false }, function (err, user) {
+				passport.authenticate('bearer', { session: false }, function (err, user, object) {
 					if (user) {
 						req.user = user;
 						return next();
 					}
 					else{
-						bannedIpService.invalidBearerCredentials(ipAddress, err.token);
+						bannedIpService.invalidBearerCredentials(ipAddress, object.token);
+						res.statusCode = 401;
+                        res.send({success: false, errorMessage:"A Valid Bearer Token is required"});
+                        next("A Valid Bearer Token is required");
 					}
 				})(req, res, next);
 			}
